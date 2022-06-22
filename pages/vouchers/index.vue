@@ -5,15 +5,10 @@
         <v-card elevation="0">
           <v-card-title>Vouchers</v-card-title>
           <v-data-table
-            :footer-props="{
-              disableItemsPerPage: true,
-            }"
             :loading="loading"
             :headers="headers"
             :items="voucherData"
-            :server-items-length="vouchersCount.count"
             class="elevation-0"
-            @update:page="handlePageChange($event)"
           >
             <template #[`item.token_name`]="{ item }">
               <b
@@ -34,20 +29,15 @@
 export default {
   name: 'VouchersIndexPage',
   async asyncData({ $axios }) {
-    const [vouchersReq, vouchersCount] = await Promise.all([
-      $axios.get(`/public/tokens?per_page=10&forward=true`),
-      $axios.get(`/public/tokens-count`),
-    ])
+    const vouchersReq = await $axios.get(`/public/tokens`)
 
     return {
       voucherData: vouchersReq.data,
-      vouchersCount: vouchersCount.data,
     }
   },
   data() {
     return {
       voucherData: [],
-      vouchersCount: 0,
       currentPage: 1,
       loading: false,
     }
@@ -57,13 +47,13 @@ export default {
       const headers = [
         {
           text: 'Voucher Name',
-          sortable: false,
+          sortable: true,
           align: 'start',
           value: 'token_name',
         },
         {
           text: 'Voucher Symbol',
-          sortable: false,
+          sortable: true,
           value: 'token_symbol',
         },
         {
@@ -78,29 +68,6 @@ export default {
       }
 
       return headers
-    },
-  },
-  methods: {
-    async handlePageChange($event) {
-      this.loading = true
-      if ($event > this.currentPage) {
-        const offset = this.voucherData[this.voucherData.length - 1].id
-        const data = await this.$axios.$get(
-          `/public/tokens?per_page=10&forward=true&cursor=${offset}`
-        )
-        this.voucherData = data
-        this.currentPage = $event
-      }
-
-      if ($event < this.currentPage) {
-        const offset = this.voucherData[0].id
-        const data = await this.$axios.$get(
-          `/public/tokens?per_page=10&forward=false&cursor=${offset}`
-        )
-        this.voucherData = data
-        this.currentPage = $event
-      }
-      this.loading = false
     },
   },
 }

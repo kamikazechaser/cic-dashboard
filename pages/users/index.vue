@@ -35,6 +35,49 @@
       </v-card-text>
     </v-card>
     <v-card
+      v-show="showBalancesCard"
+      elevation="1"
+      class="mx-auto mb-2"
+      outlined
+      max-width="800"
+    >
+      <v-card-title
+        >Balances
+        <v-spacer></v-spacer>
+        <v-btn
+          v-show="byPhone"
+          depressed
+          small
+          dark
+          color="light-green"
+          @click="transactions"
+        >
+          <v-icon left>mdi-notification-clear-all</v-icon>
+          <b>See Transactions</b>
+        </v-btn>
+      </v-card-title>
+      <v-card-text class="black--text">
+        <v-simple-table>
+          <template #default>
+            <thead>
+              <tr>
+                <th class="text-left">Voucher</th>
+                <th class="text-left">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="n in balances" :key="n.symbol">
+                <td>
+                  {{ n.symbol }}
+                </td>
+                <td>{{ n.balance / 1000000 }}</td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </v-card-text>
+    </v-card>
+    <v-card
       v-show="showMetaCard"
       elevation="1"
       class="mx-auto"
@@ -43,20 +86,6 @@
     >
       <v-card-title>User Details</v-card-title>
       <v-card-text class="black--text">
-        <p>
-          <b>Balances: </b>
-          <v-chip-group column>
-            <v-chip
-              v-for="n in balances"
-              :key="n"
-              small
-              active-class="white--text"
-              dark
-              color="indigo"
-              >{{ n.symbol }}: {{ n.balance / 1000000 }}</v-chip
-            >
-          </v-chip-group>
-        </p>
         <p><b>Name: </b> {{ metaData.name }}</p>
         <p>
           <b>Registred on: </b>
@@ -91,6 +120,7 @@ export default {
   data() {
     return {
       showMetaCard: false,
+      showBalancesCard: false,
       identifier: '',
       address: '',
       phone: '',
@@ -123,6 +153,36 @@ export default {
     },
   },
   methods: {
+    async transactions() {
+      await this.$router.push(`/users/transactions/${this.phone}`)
+    },
+    async metaReq() {
+      try {
+        const metaLookup = await this.$axios.get(
+          `admin/meta-proxy/${this.address}`
+        )
+
+        this.metaData = metaLookup.data
+        this.showMetaCard = true
+      } catch (error) {
+        this.loading = false
+        this.errorMessage = error.response.data
+        this.isError = true
+      }
+    },
+    async balanceReq() {
+      try {
+        const balances = await this.$axios.get(
+          `public/balances/${this.address}`
+        )
+        this.balances = balances.data
+        this.showBalancesCard = true
+      } catch (error) {
+        this.loading = false
+        this.errorMessage = error.response.data
+        this.isError = true
+      }
+    },
     async lookup() {
       this.showMetaCard = false
       this.loading = true
@@ -154,20 +214,10 @@ export default {
         }
       }
 
-      try {
-        const [metaLookup, balances] = await Promise.all([
-          this.$axios.get(`admin/meta-proxy/${this.address}`),
-          this.$axios.get(`public/balances/${this.address}`),
-        ])
-        this.metaData = metaLookup.data
-        this.balances = balances.data
-        this.loading = false
-        this.showMetaCard = true
-      } catch (error) {
-        this.loading = false
-        this.errorMessage = error.response.data
-        this.isError = true
-      }
+      await this.balanceReq()
+      await this.metaReq()
+
+      this.loading = false
     },
   },
 }

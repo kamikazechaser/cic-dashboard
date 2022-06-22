@@ -44,7 +44,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item disabled to="/accounts">
+        <!-- <v-list-item disabled to="/accounts">
           <v-list-item-icon>
             <v-icon>mdi-wallet</v-icon>
           </v-list-item-icon>
@@ -72,7 +72,7 @@
           <v-list-item-content>
             <v-list-item-title>Social Network</v-list-item-title>
           </v-list-item-content>
-        </v-list-item>
+        </v-list-item> -->
 
         <v-list-item v-show="isAuthenticated" to="/users">
           <v-list-item-icon>
