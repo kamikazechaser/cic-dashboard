@@ -28,19 +28,17 @@
 <script>
 export default {
   name: 'VouchersIndexPage',
-  async asyncData({ $axios }) {
-    const vouchersReq = await $axios.get(`/public/tokens`)
-
-    return {
-      voucherData: vouchersReq.data,
-    }
-  },
   data() {
     return {
       voucherData: [],
       currentPage: 1,
       loading: false,
     }
+  },
+  async fetch() {
+    const vouchersReq = await this.$axios.get(`/public/tokens`)
+
+    this.voucherData = vouchersReq.data
   },
   computed: {
     headers() {
