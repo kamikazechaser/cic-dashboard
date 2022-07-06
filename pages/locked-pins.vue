@@ -21,12 +21,6 @@
 export default {
   name: 'LockedPinsPage',
   middleware: 'auth',
-  async fecth() {
-    const pinStatus = await this.$axios.get(`/admin/pin-status`)
-
-    this.pinStatus = pinStatus.data
-  },
-  fetchOnServer: false,
   data() {
     return {
       pinStatus: [],
@@ -48,5 +42,11 @@ export default {
       ],
     }
   },
+  async fetch() {
+    const pinStatus = await this.$axios.get(`/admin/pin-status`)
+
+    this.pinStatus = pinStatus.data
+  },
+  fetchOnServer: false,
 }
 </script>
