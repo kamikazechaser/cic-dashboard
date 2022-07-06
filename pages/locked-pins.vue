@@ -26,6 +26,7 @@ export default {
 
     this.pinStatus = pinStatus.data
   },
+  fetchOnServer: false,
   data() {
     return {
       pinStatus: [],

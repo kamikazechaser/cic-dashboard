@@ -40,6 +40,7 @@ export default {
 
     this.voucherData = vouchersReq.data
   },
+  fetchOnServer: false,
   computed: {
     headers() {
       const headers = [
