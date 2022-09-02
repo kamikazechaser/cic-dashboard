@@ -76,7 +76,9 @@ export default {
   },
   async fetch() {
     const dateToday = new Date()
-    const dateStart = new Date(dateToday.getFullYear(), dateToday.getMonth(), 1)
+    const dateStart = new Date()
+
+    dateStart.setDate(dateStart.getDate() - 30)
 
     const start = dateStart.toISOString().split('T')[0]
     const end = dateToday.toISOString().split('T')[0]
